@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>タグくる v0.3 | コトハコlabo</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Yu Gothic", sans-serif;
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 24px 16px;
+      background: #f5f7fa;
+      color: #333;
+      line-height: 1.6;
+    }
+    h1 { color: #1A2B4A; margin-bottom: 4px; font-size: 24px; }
+    .version { color: #999; font-size: 12px; font-weight: normal; }
+    .subtitle { color: #666; font-size: 13px; margin-bottom: 24px; }
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .card {
+      background: white;
+      border-radius: 10px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+    label { display: block; font-weight: bold; margin-bottom: 8px; font-size: 14px; color: #1A2B4A; }
+    textarea {
+      width: 100%;
+      min-height: 180px;
+      padding: 12px;
+      border: 1px solid #cfd6dd;
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: inherit;
+      resize: vertical;
+    }
+    textarea:focus, input:focus, select:focus { outline: none; border-color: #E0B340; }
+    select, input[type=text] {
+      padding: 10px 14px;
+      font-size: 14px;
+      border: 1px solid #cfd6dd;
+      border-radius: 6px;
+      background: white;
+      font-family: inherit;
+    }
+    .full-width { width: 100%; }
+    button {
+      background: #E0B340;
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.15s;
+    }
+    button:hover { background: #C99A30; }
+    .secondary-btn {
+      background: #6c7a89;
+      font-size: 13px;
+      padding: 8px 16px;
+    }
+    .secondary-btn:hover { background: #556270; }
+    .danger-btn {
+      background: #d33;
+      font-size: 13px;
+      padding: 8px 16px;
+    }
+    .danger-btn:hover { background: #b22; }
+    .ghost-btn {
+      background: white;
+      color: #1A2B4A;
+      border: 1px solid #cfd6dd;
+      font-size: 13px;
+      padding: 8px 16px;
+    }
+    .ghost-btn:hover { background: #f0f3f7; }
+    h2 { color: #1A2B4A; font-size: 18px; margin-top: 0; }
+    .tag-item {
+      padding: 12px 14px;
+      margin: 8px 0;
+      background: #fafbfc;
+      border-left: 3px solid #1A2B4A;
+      border-radius: 4px;
+    }
+    .tag-name {
+      font-weight: bold;
+      color: #1A2B4A;
+      font-size: 16px;
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+    }
+    .tag-category {
+      display: inline-block;
+      padding: 2px 8px;
+      font-size: 11px;
+      border-radius: 3px;
+      margin-left: 8px;
+      color: white;
+      vertical-align: middle;
+    }
+    .cat-omikuji { background: #4CAF50; }
+    .cat-large { background: #2196F3; }
+    .cat-medium { background: #FF9800; }
+    .cat-niche { background: #E91E63; }
+    .tag-reason { font-size: 13px; color: #666; margin-top: 4px; }
+    .copy-area {
+      margin-top: 20px;
+      padding: 14px;
+      background: #1A2B4A;
+      color: #fff;
+      border-radius: 6px;
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      font-size: 14px;
+      word-break: break-all;
+    }
+    .copy-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+    }
+    .copied-msg {
+      color: #4CAF50;
+      font-size: 13px;
+      font-weight: bold;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .copied-msg.show { opacity: 1; }
+
+    .legend {
+      font-size: 12px;
+      color: #666;
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid #eee;
+    }
+    .legend-title {
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #333;
+    }
+    .legend-item {
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+    }
+    .legend-item .tag-category {
+      margin-left: 0;
+      margin-right: 8px;
+      min-width: 40px;
+      text-align: center;
+    }
+
+    .footer {
+      text-align: center;
+      color: #999;
+      font-size: 11px;
+      margin-top: 32px;
+      padding: 16px 0;
+    }
+    .ng-warning {
+      background: #FFF3E0;
+      color: #E65100;
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      margin-top: 12px;
+      border-left: 3px solid #E65100;
+    }
+
+    .editor-toolbar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      align-items: center;
+    }
+    .genre-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 16px;
+      border-bottom: 2px solid #eee;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      background: transparent;
+      color: #666;
+      border: none;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+    }
+    .tab-btn.active {
+      color: #1A2B4A;
+      border-bottom-color: #E0B340;
+    }
+    .edit-tag-card {
+      background: #fafbfc;
+      border: 1px solid #e0e6ed;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .edit-tag-row {
+      display: grid;
+      grid-template-columns: 1fr 130px;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .edit-tag-card label {
+      font-size: 12px;
+      margin-bottom: 4px;
+      color: #555;
+    }
+    .edit-tag-card input[type=text], .edit-tag-card select, .edit-tag-card textarea {
+      width: 100%;
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+    .edit-tag-card textarea { min-height: 50px; }
+    .edit-tag-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+    }
+    .always-label {
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #555;
+      font-weight: normal;
+    }
+    .add-tag-card {
+      background: #fff7e0;
+      border: 2px dashed #E0B340;
+      text-align: center;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+    .save-indicator {
+      font-size: 12px;
+      color: #4CAF50;
+      margin-left: auto;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .save-indicator.show { opacity: 1; }
+    .intro-tip {
+      background: #E8F4FD;
+      border-left: 3px solid #2196F3;
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #1A2B4A;
+      margin-bottom: 16px;
+    }
+
+    /* ──────────────────────────────────────────
+       📱 モバイル対応（〜600px）
+       ────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      body {
+        padding: 16px 12px;
+      }
+      h1 { font-size: 20px; }
+      .subtitle { font-size: 12px; }
+      .card {
+        padding: 18px 14px;
+        border-radius: 8px;
+      }
+
+      /* トップバー：縦並び */
+      .top-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+      .top-bar .ghost-btn {
+        width: 100%;
+        padding: 12px 16px;
+        min-height: 44px;
+      }
+
+      /* メインボタン：全幅・タップしやすく */
+      button {
+        padding: 16px 20px;
+        font-size: 15px;
+        min-height: 48px;
+      }
+      .card > div > button {
+        width: 100%;
+      }
+
+      /* セレクト・入力欄 */
+      select, input[type=text] {
+        padding: 12px 14px;
+        font-size: 16px; /* iOS Safari でズーム回避 */
+      }
+      textarea {
+        min-height: 160px;
+        font-size: 15px;
+      }
+
+      /* エディタツールバー：縦並び・全幅 */
+      .editor-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+      .editor-toolbar button {
+        width: 100%;
+        padding: 12px 16px;
+        min-height: 44px;
+        font-size: 14px;
+      }
+      .save-indicator {
+        text-align: center;
+        margin-left: 0;
+      }
+
+      /* ジャンルタブ：折返し前提・タップしやすく */
+      .genre-tabs {
+        gap: 2px;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 4px;
+      }
+      .tab-btn {
+        padding: 10px 12px;
+        font-size: 12px;
+        white-space: nowrap;
+        min-height: 40px;
+      }
+
+      /* タグ編集カード：単一カラムに */
+      .edit-tag-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+      .edit-tag-card {
+        padding: 14px;
+      }
+      .edit-tag-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+      .edit-tag-actions .danger-btn {
+        width: 100%;
+        padding: 12px;
+        min-height: 44px;
+      }
+      .always-label {
+        font-size: 13px;
+      }
+
+      /* コピーエリアと操作行：縦並び */
+      .copy-row {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+      }
+      .copy-row .secondary-btn {
+        width: 100%;
+        padding: 12px;
+        min-height: 44px;
+      }
+      .copied-msg {
+        text-align: center;
+      }
+      .copy-area {
+        font-size: 13px;
+        padding: 12px;
+      }
+
+      /* タグ表示 */
+      .tag-item { padding: 10px 12px; }
+      .tag-name { font-size: 15px; }
+      .tag-reason { font-size: 12px; }
+
+      /* イントロチップ */
+      .intro-tip { font-size: 12px; padding: 10px 12px; }
+    }
+
+    /* ──────────────────────────────────────────
+       📱 さらに小さい画面（〜380px）の微調整
+       ────────────────────────────────────────── */
+    @media (max-width: 380px) {
+      h1 { font-size: 18px; }
+      .card { padding: 14px 12px; }
+      .tab-btn { padding: 8px 10px; font-size: 11px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <div>
+      <h1>🏷️ タグくる <span class="version">v0.3 prototype</span></h1>
+      <p class="subtitle">noteの記事にぴったりのハッシュタグを提案します ｜ by <strong>コトハコlabo</strong></p>
+    </div>
+    <button class="ghost-btn" id="toggleEditorBtn" onclick="toggleEditor()">⚙️ 辞書を編集</button>
+  </div>
+
+  <!-- ─────── メイン画面 ─────── -->
+  <div id="mainView">
+    <div class="card">
+      <div class="intro-tip">
+        💡 <strong>はじめての方へ</strong>：書きたい記事のジャンルを選んで、本文を貼り付けるだけ。<br>
+        お題タグ／大箱／中箱／ニッチをバランスよく5〜10個提案します。
+      </div>
+
+      <label for="genre">📚 ジャンルを選ぶ</label>
+      <select id="genre" class="full-width"></select>
+
+      <label for="article" style="margin-top: 16px;">📝 記事本文 or タイトル＋本文（テキストで貼り付け）</label>
+      <textarea id="article" placeholder="ここに記事の本文やタイトルを貼り付けてください。&#10;キーワードからハッシュタグを提案します。"></textarea>
+
+      <div style="margin-top: 16px;">
+        <button onclick="suggestTags()">🏷️ ハッシュタグを提案する</button>
+      </div>
+    </div>
+
+    <div class="card" id="output" style="display:none;">
+      <h2>📝 提案ハッシュタグ</h2>
+      <div id="tags"></div>
+
+      <div class="copy-area" id="copyArea"></div>
+      <div class="copy-row">
+        <span class="copied-msg" id="copiedMsg">✓ コピーしました</span>
+        <button class="secondary-btn" onclick="copyTags()">📋 コピー</button>
+      </div>
+
+      <div class="legend">
+        <div class="legend-title">カテゴリ凡例</div>
+        <div class="legend-item"><span class="tag-category cat-omikuji">お題</span>note内露出・コミュニティ参加</div>
+        <div class="legend-item"><span class="tag-category cat-large">大箱</span>大規模露出（投稿数多め）</div>
+        <div class="legend-item"><span class="tag-category cat-medium">中箱</span>ターゲット層直撃</div>
+        <div class="legend-item"><span class="tag-category cat-niche">ニッチ</span>差別化・検索直撃（投稿数少なめ）</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────── 辞書エディタ画面 ─────── -->
+  <div id="editorView" style="display:none;">
+    <div class="card">
+      <h2>⚙️ タグ辞書エディタ</h2>
+      <p style="color: #666; font-size: 13px;">
+        各ジャンルのタグを自由に追加・編集・削除できます。<br>
+        変更はブラウザに自動保存されます。バックアップは「📥 エクスポート」で。
+      </p>
+
+      <div id="storageWarning" class="ng-warning" style="display:none;">
+        ⚠️ <strong>このブラウザでは辞書を保存できません</strong>（セキュリティ仕様）。<br>
+        編集はその場では反映されますが、<strong>ページを閉じると消えます</strong>。<br>
+        永続保存したい場合は、<strong>通常のブラウザ</strong>（Chrome / Edge / Safari 等）で開いてください。
+      </div>
+
+      <div class="editor-toolbar">
+        <button class="ghost-btn" onclick="toggleEditor()">← 戻る</button>
+        <button class="secondary-btn" onclick="exportDB()">📥 エクスポート</button>
+        <button class="secondary-btn" onclick="importDB()">📤 インポート</button>
+        <button class="danger-btn" onclick="resetDB()">🔄 デフォルトに戻す</button>
+        <span class="save-indicator" id="saveIndicator">✓ 保存しました</span>
+      </div>
+
+      <div class="genre-tabs" id="genreTabs"></div>
+
+      <div class="add-tag-card">
+        <button class="ghost-btn" onclick="addNewTag()">+ 新しいタグを追加</button>
+      </div>
+
+      <div id="editorList"></div>
+    </div>
+
+    <input type="file" id="importFile" accept=".json" style="display:none;" onchange="handleImport(event)">
+  </div>
+
+  <div class="footer">
+    <div style="margin-bottom: 8px;">
+      <a href="about.html" style="color: #6c7a89; text-decoration: none; margin: 0 8px;">タグくるについて</a>
+      ｜
+      <a href="privacy.html" style="color: #6c7a89; text-decoration: none; margin: 0 8px;">プライバシーポリシー</a>
+    </div>
+    タグくる v0.3 prototype ｜ by <strong>コトハコlabo</strong> ｜ 運営：けい
+  </div>
+
+  <script>
+    // ──────────────────────────────────────────
+    // ジャンルメタデータ
+    // ──────────────────────────────────────────
+    const genreMeta = {
+      side_business: { emoji: '💼', name: '副業・お金稼ぎ' },
+      investment:    { emoji: '📊', name: '投資・資産形成' },
+      essay:         { emoji: '✏️', name: 'エッセイ・日常' },
+      business:      { emoji: '🏢', name: 'ビジネス・キャリア' },
+      tech_ai:       { emoji: '🤖', name: 'テクノロジー・AI' },
+      learning:      { emoji: '📚', name: '学び・自己啓発' },
+      creative:      { emoji: '🎨', name: '創作・クリエイティブ' },
+      health:        { emoji: '🌿', name: '健康・ライフスタイル' }
+    };
+
+    const genreOrder = ['side_business', 'investment', 'essay', 'business', 'tech_ai', 'learning', 'creative', 'health'];
+
+    // ──────────────────────────────────────────
+    // デフォルトタグ辞書（ジャンル別）
+    // ──────────────────────────────────────────
+    const defaultTagDB = {
+      side_business: [
+        // お題
+        { tag: '#note', cat: 'omikuji', keywords: [], always: true, reason: 'note内コミュニティ・基本タグ' },
+        { tag: '#毎日note', cat: 'omikuji', keywords: ['毎日', '継続', 'チャレンジ'], always: false, reason: '継続感アピール' },
+        { tag: '#ビジネス', cat: 'omikuji', keywords: ['ビジネス', '仕事'], always: false, reason: 'お題タグ・露出' },
+        // 大箱
+        { tag: '#副業', cat: 'large', keywords: ['副業', '稼ぐ', '収入', 'マネタイズ'], always: true, reason: 'ジャンル軸・大規模露出' },
+        { tag: '#フリーランス', cat: 'large', keywords: ['フリーランス', '独立', '個人事業主'], always: false, reason: '関連大箱' },
+        { tag: '#働き方', cat: 'large', keywords: ['働き方', 'ライフスタイル'], always: false, reason: '広めの層' },
+        { tag: '#お金', cat: 'large', keywords: ['お金', '収入'], always: false, reason: '広めの大箱' },
+        { tag: '#稼ぐ', cat: 'large', keywords: ['稼ぐ', '収益'], always: false, reason: '具体大箱' },
+        // 中箱
+        { tag: '#副業初心者', cat: 'medium', keywords: ['初心者', '始め方', '初めて'], always: false, reason: 'ターゲット層直撃' },
+        { tag: '#在宅ワーク', cat: 'medium', keywords: ['在宅', 'リモート', '自宅'], always: false, reason: '関連中箱' },
+        { tag: '#ライティング', cat: 'medium', keywords: ['ライティング', 'ライター', '文章', '書く'], always: false, reason: 'スキル系' },
+        { tag: '#note更新', cat: 'medium', keywords: ['新記事', '公開', '更新'], always: false, reason: '記事告知用' },
+        { tag: '#web副業', cat: 'medium', keywords: ['web', 'web副業', 'オンライン'], always: false, reason: 'カテゴリ' },
+        { tag: '#個人事業主', cat: 'medium', keywords: ['個人事業主', '開業'], always: false, reason: '関連中箱' },
+        { tag: '#独立', cat: 'medium', keywords: ['独立', '退職'], always: false, reason: '関連中箱' },
+        { tag: '#起業', cat: 'medium', keywords: ['起業', '創業'], always: false, reason: '関連中箱' },
+        // ニッチ
+        { tag: '#ライティング副業', cat: 'niche', keywords: ['ライティング', '副業'], always: false, reason: '特化ニッチ' },
+        { tag: '#クラウドソーシング', cat: 'niche', keywords: ['クラウドソーシング', 'ランサーズ', 'クラウドワークス'], always: false, reason: 'サービス検索' },
+        { tag: '#体験談', cat: 'niche', keywords: ['やってみた', '体験', '挑戦'], always: false, reason: '共感系' },
+        { tag: '#始め方', cat: 'niche', keywords: ['始め方', '手順', 'ロードマップ'], always: false, reason: '具体ニーズ' },
+        { tag: '#ランサーズ', cat: 'niche', keywords: ['ランサーズ', 'lancers'], always: false, reason: 'サービス検索' },
+        { tag: '#クラウドワークス', cat: 'niche', keywords: ['クラウドワークス', 'crowdworks'], always: false, reason: 'サービス検索' },
+        { tag: '#ココナラ', cat: 'niche', keywords: ['ココナラ', 'coconala'], always: false, reason: 'サービス検索' },
+        { tag: '#アフィリエイト', cat: 'niche', keywords: ['アフィリエイト', 'アフィ', 'A8'], always: false, reason: '収益化手段' },
+        { tag: '#ブログ収入', cat: 'niche', keywords: ['ブログ', '収入', 'PV'], always: false, reason: '収益化手段' },
+        { tag: '#note収益化', cat: 'niche', keywords: ['有料note', '収益化', '販売'], always: false, reason: '具体ニーズ' },
+        { tag: '#コンテンツ販売', cat: 'niche', keywords: ['コンテンツ販売', 'デジタル販売'], always: false, reason: '販売モデル' },
+        { tag: '#フリーランスの日常', cat: 'niche', keywords: ['フリーランス', '日常', '日記'], always: false, reason: 'ライフ系' },
+        { tag: '#副業日記', cat: 'niche', keywords: ['副業日記', '記録'], always: false, reason: 'シリーズ性' },
+        { tag: '#月収公開', cat: 'niche', keywords: ['月収', '実績', '公開'], always: false, reason: '数字アピール' },
+        { tag: '#会社員副業', cat: 'niche', keywords: ['会社員', '兼業', 'サラリーマン'], always: false, reason: '属性ターゲット' },
+        { tag: '#大学生副業', cat: 'niche', keywords: ['大学生', '学生'], always: false, reason: '属性ターゲット' },
+        { tag: '#SNS運用代行', cat: 'niche', keywords: ['SNS運用', '運用代行', 'インスタ運用'], always: false, reason: '具体仕事' }
+      ],
+      investment: [
+        // お題
+        { tag: '#note', cat: 'omikuji', keywords: [], always: true, reason: 'note内コミュニティ・基本タグ' },
+        { tag: '#お金の勉強', cat: 'omikuji', keywords: ['お金', '勉強'], always: false, reason: 'お題タグ' },
+        { tag: '#毎日note', cat: 'omikuji', keywords: ['毎日', '継続'], always: false, reason: '継続アピール' },
+        // 大箱
+        { tag: '#資産形成', cat: 'large', keywords: ['資産', '形成', '運用'], always: true, reason: 'ジャンル軸・大規模露出' },
+        { tag: '#新NISA', cat: 'large', keywords: ['NISA', '新NISA', 'つみたて'], always: false, reason: 'トレンドワード' },
+        { tag: '#投資', cat: 'large', keywords: ['投資'], always: false, reason: '広め大箱' },
+        { tag: '#お金', cat: 'large', keywords: ['お金'], always: false, reason: '広め大箱' },
+        { tag: '#節約', cat: 'large', keywords: ['節約', '貯金'], always: false, reason: '関連大箱' },
+        // 中箱
+        { tag: '#投資初心者', cat: 'medium', keywords: ['初心者', '初めて', '基礎'], always: false, reason: 'ターゲット層' },
+        { tag: '#ポイ活', cat: 'medium', keywords: ['ポイント', 'ポイ活', 'ハピタス'], always: false, reason: '関連中箱' },
+        { tag: '#FIRE', cat: 'medium', keywords: ['FIRE', '早期リタイア', '経済的自由'], always: false, reason: 'トレンド層' },
+        { tag: '#つみたて投資', cat: 'medium', keywords: ['つみたて', 'つみたて投資'], always: false, reason: '関連中箱' },
+        { tag: '#長期投資', cat: 'medium', keywords: ['長期投資', '長期'], always: false, reason: '戦略系' },
+        { tag: '#分散投資', cat: 'medium', keywords: ['分散投資', '分散'], always: false, reason: '戦略系' },
+        { tag: '#インデックス投資', cat: 'medium', keywords: ['インデックス', 'インデックス投資'], always: false, reason: '戦略系' },
+        { tag: '#家計簿', cat: 'medium', keywords: ['家計簿', '家計'], always: false, reason: '関連中箱' },
+        // ニッチ
+        { tag: '#SBI証券', cat: 'niche', keywords: ['SBI', 'SBI証券'], always: false, reason: 'サービス検索' },
+        { tag: '#楽天証券', cat: 'niche', keywords: ['楽天証券', '楽天'], always: false, reason: 'サービス検索' },
+        { tag: '#マネックス証券', cat: 'niche', keywords: ['マネックス'], always: false, reason: 'サービス検索' },
+        { tag: '#つみたて', cat: 'niche', keywords: ['つみたて', '積立'], always: false, reason: '関連ニッチ' },
+        { tag: '#クレカ積立', cat: 'niche', keywords: ['クレカ積立', 'クレジット積立'], always: false, reason: '具体ニーズ' },
+        { tag: '#高配当株', cat: 'niche', keywords: ['高配当', '配当株', '配当'], always: false, reason: '具体ニーズ' },
+        { tag: '#米国株', cat: 'niche', keywords: ['米国株', 'アメリカ株', 'US株'], always: false, reason: '市場別' },
+        { tag: '#全世界株', cat: 'niche', keywords: ['全世界株', '全世界'], always: false, reason: '商品別' },
+        { tag: '#オルカン', cat: 'niche', keywords: ['オルカン', 'all country'], always: false, reason: '商品別' },
+        { tag: '#S&P500', cat: 'niche', keywords: ['S&P500', 'sp500'], always: false, reason: '指数別' },
+        { tag: '#iDeCo', cat: 'niche', keywords: ['iDeCo', 'イデコ'], always: false, reason: '制度別' },
+        { tag: '#投資信託', cat: 'niche', keywords: ['投資信託'], always: false, reason: '商品別' },
+        { tag: '#ETF', cat: 'niche', keywords: ['ETF'], always: false, reason: '商品別' },
+        { tag: '#配当金生活', cat: 'niche', keywords: ['配当金生活', '配当金'], always: false, reason: 'ライフ系' },
+        { tag: '#暗号資産', cat: 'niche', keywords: ['暗号資産', '仮想通貨', 'crypto'], always: false, reason: 'カテゴリ別' },
+        { tag: '#ビットコイン', cat: 'niche', keywords: ['ビットコイン', 'BTC'], always: false, reason: '商品別' },
+        { tag: '#FX', cat: 'niche', keywords: ['FX', '外国為替'], always: false, reason: 'カテゴリ別' },
+        { tag: '#貯金', cat: 'niche', keywords: ['貯金', '貯蓄'], always: false, reason: '基礎' }
+      ],
+      essay: [
+        // お題
+        { tag: '#エッセイ', cat: 'omikuji', keywords: [], always: true, reason: 'ジャンル定番タグ' },
+        { tag: '#日記', cat: 'omikuji', keywords: ['日記', '記録'], always: false, reason: 'お題タグ' },
+        { tag: '#今日の振り返り', cat: 'omikuji', keywords: ['振り返り', '今日'], always: false, reason: 'お題タグ' },
+        { tag: '#毎日note', cat: 'omikuji', keywords: ['毎日', '継続'], always: false, reason: '継続感' },
+        // 大箱
+        { tag: '#日常', cat: 'large', keywords: ['日常', '生活'], always: true, reason: 'ジャンル軸・大規模露出' },
+        { tag: '#思考', cat: 'large', keywords: ['思考', '考え'], always: false, reason: '内省系' },
+        { tag: '#ライフスタイル', cat: 'large', keywords: ['ライフスタイル', '暮らし'], always: false, reason: '広め大箱' },
+        { tag: '#人生', cat: 'large', keywords: ['人生', '生き方'], always: false, reason: '広め大箱' },
+        // 中箱
+        { tag: '#共感', cat: 'medium', keywords: ['共感', '同じ', 'わかる'], always: false, reason: '共感層' },
+        { tag: '#note更新', cat: 'medium', keywords: ['新記事', '更新'], always: false, reason: '記事告知用' },
+        { tag: '#自己紹介', cat: 'medium', keywords: ['自己紹介', 'はじめまして'], always: false, reason: '入り口タグ' },
+        { tag: '#思考の整理', cat: 'medium', keywords: ['思考', '考え', '気づき'], always: false, reason: '内省系' },
+        { tag: '#日々のこと', cat: 'medium', keywords: ['日々', '日常'], always: false, reason: 'ライフ系' },
+        { tag: '#日々雑感', cat: 'medium', keywords: ['雑感', '感じる'], always: false, reason: 'エッセイ系' },
+        { tag: '#気づき', cat: 'medium', keywords: ['気づき', '発見'], always: false, reason: '内省系' },
+        // ニッチ
+        { tag: '#あるある', cat: 'niche', keywords: ['あるある'], always: false, reason: '共感RT誘発' },
+        { tag: '#体験談', cat: 'niche', keywords: ['体験', 'やってみた'], always: false, reason: '体験系' },
+        { tag: '#雑記', cat: 'niche', keywords: ['雑記', 'よしなしごと'], always: false, reason: 'ニッチ' },
+        { tag: '#つぶやき', cat: 'niche', keywords: ['つぶやき', 'ひとりごと'], always: false, reason: 'ニッチ' },
+        { tag: '#短編エッセイ', cat: 'niche', keywords: ['短編', '短い'], always: false, reason: '形式別' },
+        { tag: '#日々の気づき', cat: 'niche', keywords: ['気づき', '発見'], always: false, reason: '内省系' },
+        { tag: '#暮らしのこと', cat: 'niche', keywords: ['暮らし', '生活'], always: false, reason: 'ライフ系' },
+        { tag: '#些細な発見', cat: 'niche', keywords: ['発見', '些細'], always: false, reason: 'ニッチ' },
+        { tag: '#カフェエッセイ', cat: 'niche', keywords: ['カフェ', 'コーヒー'], always: false, reason: 'シーン別' },
+        { tag: '#ひとり時間', cat: 'niche', keywords: ['ひとり時間', '一人時間'], always: false, reason: 'ライフ系' },
+        { tag: '#人生について', cat: 'niche', keywords: ['人生', '生き方'], always: false, reason: '内省系' },
+        { tag: '#20代の悩み', cat: 'niche', keywords: ['20代', '悩み'], always: false, reason: '年代別' },
+        { tag: '#30代の日常', cat: 'niche', keywords: ['30代', '日常'], always: false, reason: '年代別' },
+        { tag: '#40代の生き方', cat: 'niche', keywords: ['40代'], always: false, reason: '年代別' },
+        { tag: '#夜のひとりごと', cat: 'niche', keywords: ['夜', 'ひとりごと'], always: false, reason: 'シーン別' },
+        { tag: '#雨の日エッセイ', cat: 'niche', keywords: ['雨', '雨の日'], always: false, reason: 'シーン別' },
+        { tag: '#コラム', cat: 'niche', keywords: ['コラム'], always: false, reason: '形式別' }
+      ],
+      business: [
+        // お題
+        { tag: '#note', cat: 'omikuji', keywords: [], always: true, reason: 'note内コミュニティ・基本タグ' },
+        { tag: '#ビジネス', cat: 'omikuji', keywords: ['ビジネス'], always: false, reason: 'お題タグ' },
+        { tag: '#仕事について', cat: 'omikuji', keywords: ['仕事', '働く'], always: false, reason: 'お題タグ' },
+        // 大箱
+        { tag: '#キャリア', cat: 'large', keywords: ['キャリア', '経歴'], always: true, reason: 'ジャンル軸' },
+        { tag: '#働き方', cat: 'large', keywords: ['働き方'], always: false, reason: '関連大箱' },
+        { tag: '#仕事', cat: 'large', keywords: ['仕事', '業務'], always: false, reason: '広め大箱' },
+        { tag: '#ビジネス', cat: 'large', keywords: ['ビジネス'], always: false, reason: '広め大箱' },
+        // 中箱
+        { tag: '#転職', cat: 'medium', keywords: ['転職', '退職', '入社'], always: false, reason: 'ターゲット層' },
+        { tag: '#マネジメント', cat: 'medium', keywords: ['マネジメント', 'リーダー', '管理'], always: false, reason: '管理職層' },
+        { tag: '#生産性', cat: 'medium', keywords: ['生産性', '効率', '時短'], always: false, reason: '関連中箱' },
+        { tag: '#スキルアップ', cat: 'medium', keywords: ['スキルアップ', 'スキル', '成長'], always: false, reason: '成長志向層' },
+        { tag: '#リーダーシップ', cat: 'medium', keywords: ['リーダーシップ', 'リーダー'], always: false, reason: '管理職層' },
+        { tag: '#ビジネススキル', cat: 'medium', keywords: ['ビジネススキル'], always: false, reason: 'スキル系' },
+        { tag: '#自己成長', cat: 'medium', keywords: ['自己成長', '成長'], always: false, reason: '成長系' },
+        { tag: '#キャリアアップ', cat: 'medium', keywords: ['キャリアアップ', 'キャリア'], always: false, reason: 'ターゲット' },
+        // ニッチ
+        { tag: '#リモートワーク', cat: 'niche', keywords: ['リモート', 'テレワーク', '在宅勤務'], always: false, reason: '具体ニーズ' },
+        { tag: '#会社員', cat: 'niche', keywords: ['会社員', 'サラリーマン'], always: false, reason: '属性タグ' },
+        { tag: '#フリーランス', cat: 'niche', keywords: ['フリーランス', '独立'], always: false, reason: '属性タグ' },
+        { tag: '#起業', cat: 'niche', keywords: ['起業', '創業', 'スタートアップ'], always: false, reason: '具体ニーズ' },
+        { tag: '#転職活動', cat: 'niche', keywords: ['転職活動', '転活'], always: false, reason: '具体活動' },
+        { tag: '#エンジニア転職', cat: 'niche', keywords: ['エンジニア', '転職'], always: false, reason: '職種転職' },
+        { tag: '#面接対策', cat: 'niche', keywords: ['面接', '対策'], always: false, reason: '転職実務' },
+        { tag: '#履歴書', cat: 'niche', keywords: ['履歴書'], always: false, reason: '転職実務' },
+        { tag: '#職務経歴書', cat: 'niche', keywords: ['職務経歴書'], always: false, reason: '転職実務' },
+        { tag: '#第二新卒', cat: 'niche', keywords: ['第二新卒', '新卒'], always: false, reason: '層別' },
+        { tag: '#20代キャリア', cat: 'niche', keywords: ['20代', 'キャリア'], always: false, reason: '層別' },
+        { tag: '#30代キャリア', cat: 'niche', keywords: ['30代', 'キャリア'], always: false, reason: '層別' },
+        { tag: '#女性のキャリア', cat: 'niche', keywords: ['女性', 'キャリア'], always: false, reason: '層別' },
+        { tag: '#ワーママ', cat: 'niche', keywords: ['ワーママ', '働くママ'], always: false, reason: '層別' },
+        { tag: '#1on1', cat: 'niche', keywords: ['1on1', '1on1ミーティング'], always: false, reason: '手法別' },
+        { tag: '#コーチング', cat: 'niche', keywords: ['コーチング'], always: false, reason: '手法別' },
+        { tag: '#プロジェクトマネジメント', cat: 'niche', keywords: ['プロジェクト', 'PM'], always: false, reason: '職務' }
+      ],
+      tech_ai: [
+        // お題
+        { tag: '#note', cat: 'omikuji', keywords: [], always: true, reason: 'note内コミュニティ・基本タグ' },
+        { tag: '#毎日note', cat: 'omikuji', keywords: ['毎日'], always: false, reason: '継続感' },
+        // 大箱
+        { tag: '#AI', cat: 'large', keywords: ['AI', '人工知能'], always: true, reason: 'ジャンル軸' },
+        { tag: '#テクノロジー', cat: 'large', keywords: ['テクノロジー', 'IT'], always: false, reason: '関連大箱' },
+        { tag: '#IT', cat: 'large', keywords: ['IT', 'ICT'], always: false, reason: '広め大箱' },
+        // 中箱
+        { tag: '#生成AI', cat: 'medium', keywords: ['生成AI', 'ChatGPT', 'Claude', 'Gemini'], always: false, reason: 'トレンド層' },
+        { tag: '#ChatGPT', cat: 'medium', keywords: ['ChatGPT', 'OpenAI'], always: false, reason: 'サービス層' },
+        { tag: '#プログラミング', cat: 'medium', keywords: ['プログラミング', 'コード'], always: false, reason: '関連中箱' },
+        { tag: '#エンジニア', cat: 'medium', keywords: ['エンジニア', '開発者'], always: false, reason: '属性タグ' },
+        { tag: '#web開発', cat: 'medium', keywords: ['web', 'web開発', 'フロントエンド'], always: false, reason: 'カテゴリ' },
+        { tag: '#DX', cat: 'medium', keywords: ['DX', 'デジタル変革'], always: false, reason: 'ビジネス層' },
+        { tag: '#データサイエンス', cat: 'medium', keywords: ['データサイエンス', 'データ'], always: false, reason: 'カテゴリ' },
+        // ニッチ
+        { tag: '#ClaudeCode', cat: 'niche', keywords: ['Claude Code', 'ClaudeCode'], always: false, reason: 'ツール検索' },
+        { tag: '#プロンプト', cat: 'niche', keywords: ['プロンプト', 'プロンプトエンジニアリング'], always: false, reason: '具体ニーズ' },
+        { tag: '#プログラミング初心者', cat: 'niche', keywords: ['初心者', '入門'], always: false, reason: 'ターゲット層' },
+        { tag: '#学習記録', cat: 'niche', keywords: ['学習', '記録', '勉強'], always: false, reason: 'シリーズ性' },
+        { tag: '#Claude', cat: 'niche', keywords: ['Claude'], always: false, reason: 'サービス検索' },
+        { tag: '#Gemini', cat: 'niche', keywords: ['Gemini'], always: false, reason: 'サービス検索' },
+        { tag: '#LLM', cat: 'niche', keywords: ['LLM', '大規模言語モデル'], always: false, reason: '専門ニッチ' },
+        { tag: '#機械学習', cat: 'niche', keywords: ['機械学習', 'ML'], always: false, reason: '専門ニッチ' },
+        { tag: '#ディープラーニング', cat: 'niche', keywords: ['ディープラーニング', 'DL'], always: false, reason: '専門ニッチ' },
+        { tag: '#データ分析', cat: 'niche', keywords: ['データ分析'], always: false, reason: '専門ニッチ' },
+        { tag: '#Python', cat: 'niche', keywords: ['python'], always: false, reason: '言語別' },
+        { tag: '#JavaScript', cat: 'niche', keywords: ['javascript', 'js'], always: false, reason: '言語別' },
+        { tag: '#React', cat: 'niche', keywords: ['react'], always: false, reason: '技術別' },
+        { tag: '#TypeScript', cat: 'niche', keywords: ['typescript', 'ts'], always: false, reason: '言語別' },
+        { tag: '#vibeコーディング', cat: 'niche', keywords: ['vibe', 'バイブコーディング'], always: false, reason: 'トレンド' },
+        { tag: '#AI活用術', cat: 'niche', keywords: ['AI活用', '活用術'], always: false, reason: '実用層' },
+        { tag: '#業務効率化', cat: 'niche', keywords: ['業務効率', '効率化'], always: false, reason: 'ビジネス層' },
+        { tag: '#ノーコード', cat: 'niche', keywords: ['ノーコード', 'no-code'], always: false, reason: 'カテゴリ' },
+        { tag: '#自動化', cat: 'niche', keywords: ['自動化'], always: false, reason: '実用層' }
+      ],
+      learning: [
+        // お題
+        { tag: '#毎日note', cat: 'omikuji', keywords: ['毎日', '継続'], always: false, reason: '継続感アピール' },
+        { tag: '#学び', cat: 'omikuji', keywords: ['学び', '学ぶ'], always: true, reason: 'お題タグ・ジャンル軸' },
+        { tag: '#note', cat: 'omikuji', keywords: [], always: false, reason: '基本タグ' },
+        // 大箱
+        { tag: '#自己啓発', cat: 'large', keywords: ['自己啓発', '成長'], always: false, reason: '大規模露出' },
+        { tag: '#読書', cat: 'large', keywords: ['読書', '本', '読んだ'], always: false, reason: '関連大箱' },
+        { tag: '#勉強', cat: 'large', keywords: ['勉強', '学習'], always: false, reason: '広め大箱' },
+        { tag: '#本', cat: 'large', keywords: ['本', '書籍'], always: false, reason: '広め大箱' },
+        // 中箱
+        { tag: '#スキルアップ', cat: 'medium', keywords: ['スキルアップ', 'スキル'], always: false, reason: '成長志向層' },
+        { tag: '#本好き', cat: 'medium', keywords: ['本好き', '読書好き'], always: false, reason: '属性タグ' },
+        { tag: '#学習記録', cat: 'medium', keywords: ['記録', '日記'], always: false, reason: 'シリーズ性' },
+        { tag: '#成長', cat: 'medium', keywords: ['成長', '成長記録'], always: false, reason: '内省系' },
+        { tag: '#マインドセット', cat: 'medium', keywords: ['マインド', 'マインドセット'], always: false, reason: '思考系' },
+        { tag: '#自己投資', cat: 'medium', keywords: ['自己投資'], always: false, reason: '投資思考' },
+        { tag: '#インプット', cat: 'medium', keywords: ['インプット'], always: false, reason: '学習行動' },
+        { tag: '#アウトプット', cat: 'medium', keywords: ['アウトプット'], always: false, reason: '学習行動' },
+        // ニッチ
+        { tag: '#読書感想文', cat: 'niche', keywords: ['感想', '読了'], always: false, reason: '具体ニーズ' },
+        { tag: '#本紹介', cat: 'niche', keywords: ['紹介', 'おすすめ本'], always: false, reason: 'レコメンド層' },
+        { tag: '#ビジネス書', cat: 'niche', keywords: ['ビジネス書'], always: false, reason: 'カテゴリ' },
+        { tag: '#自己啓発本', cat: 'niche', keywords: ['自己啓発本'], always: false, reason: 'カテゴリ' },
+        { tag: '#おすすめ本', cat: 'niche', keywords: ['おすすめ', 'おすすめ本'], always: false, reason: 'レコメンド' },
+        { tag: '#読書ノート', cat: 'niche', keywords: ['読書ノート', 'ノート'], always: false, reason: '手法' },
+        { tag: '#読書記録', cat: 'niche', keywords: ['読書記録'], always: false, reason: 'シリーズ性' },
+        { tag: '#本のある暮らし', cat: 'niche', keywords: ['本のある暮らし'], always: false, reason: 'ライフ系' },
+        { tag: '#学び直し', cat: 'niche', keywords: ['学び直し', '学習'], always: false, reason: 'トレンド' },
+        { tag: '#リスキリング', cat: 'niche', keywords: ['リスキリング'], always: false, reason: 'トレンド' },
+        { tag: '#英語学習', cat: 'niche', keywords: ['英語', '英会話', 'TOEIC'], always: false, reason: '具体スキル' },
+        { tag: '#資格勉強', cat: 'niche', keywords: ['資格', '試験'], always: false, reason: '具体目標' },
+        { tag: '#朝活読書', cat: 'niche', keywords: ['朝活', '朝読書'], always: false, reason: 'ライフ系' },
+        { tag: '#社会人の学び', cat: 'niche', keywords: ['社会人', '学び'], always: false, reason: '層別' },
+        { tag: '#コーチング', cat: 'niche', keywords: ['コーチング'], always: false, reason: '手法' },
+        { tag: '#習慣化', cat: 'niche', keywords: ['習慣', '習慣化'], always: false, reason: '実践系' }
+      ],
+      creative: [
+        // お題
+        { tag: '#note', cat: 'omikuji', keywords: [], always: true, reason: 'note内コミュニティ・基本タグ' },
+        { tag: '#毎日note', cat: 'omikuji', keywords: ['毎日'], always: false, reason: '継続感' },
+        // 大箱
+        { tag: '#創作', cat: 'large', keywords: ['創作', '作品'], always: true, reason: 'ジャンル軸' },
+        { tag: '#小説', cat: 'large', keywords: ['小説', 'ストーリー'], always: false, reason: '関連大箱' },
+        { tag: '#デザイン', cat: 'large', keywords: ['デザイン', 'デザイナー'], always: false, reason: '関連大箱' },
+        { tag: '#アート', cat: 'large', keywords: ['アート', 'art'], always: false, reason: '広め大箱' },
+        // 中箱
+        { tag: '#イラスト', cat: 'medium', keywords: ['イラスト', '絵'], always: false, reason: '関連中箱' },
+        { tag: '#漫画', cat: 'medium', keywords: ['漫画', 'マンガ', 'コミック'], always: false, reason: '関連中箱' },
+        { tag: '#クリエイター', cat: 'medium', keywords: ['クリエイター', '作り手'], always: false, reason: '属性タグ' },
+        { tag: '#エッセイ漫画', cat: 'medium', keywords: ['エッセイ漫画'], always: false, reason: '関連中箱' },
+        { tag: '#ものづくり', cat: 'medium', keywords: ['ものづくり', '作る'], always: false, reason: '広め中箱' },
+        { tag: '#表現', cat: 'medium', keywords: ['表現', '自己表現'], always: false, reason: '内省系' },
+        // ニッチ
+        { tag: '#創作小説', cat: 'niche', keywords: ['創作小説'], always: false, reason: '具体ジャンル' },
+        { tag: '#ショートショート', cat: 'niche', keywords: ['ショート', 'ショートショート'], always: false, reason: '具体ジャンル' },
+        { tag: '#詩', cat: 'niche', keywords: ['詩', 'ポエム'], always: false, reason: '具体ジャンル' },
+        { tag: '#絵日記', cat: 'niche', keywords: ['絵日記'], always: false, reason: '具体ジャンル' },
+        { tag: '#短歌', cat: 'niche', keywords: ['短歌'], always: false, reason: '具体ジャンル' },
+        { tag: '#俳句', cat: 'niche', keywords: ['俳句'], always: false, reason: '具体ジャンル' },
+        { tag: '#SF', cat: 'niche', keywords: ['SF', 'サイエンスフィクション'], always: false, reason: 'ジャンル' },
+        { tag: '#ファンタジー', cat: 'niche', keywords: ['ファンタジー'], always: false, reason: 'ジャンル' },
+        { tag: '#ミステリー', cat: 'niche', keywords: ['ミステリー', '推理'], always: false, reason: 'ジャンル' },
+        { tag: '#恋愛小説', cat: 'niche', keywords: ['恋愛小説', '恋愛'], always: false, reason: 'ジャンル' },
+        { tag: '#純文学', cat: 'niche', keywords: ['純文学'], always: false, reason: 'ジャンル' },
+        { tag: '#コラム', cat: 'niche', keywords: ['コラム'], always: false, reason: '形式' },
+        { tag: '#4コマ漫画', cat: 'niche', keywords: ['4コマ'], always: false, reason: '形式' },
+        { tag: '#日常イラスト', cat: 'niche', keywords: ['日常イラスト'], always: false, reason: 'スタイル' },
+        { tag: '#アナログイラスト', cat: 'niche', keywords: ['アナログ', '手描き'], always: false, reason: 'スタイル' },
+        { tag: '#デジタルイラスト', cat: 'niche', keywords: ['デジタルイラスト', 'デジタル'], always: false, reason: 'スタイル' },
+        { tag: '#UIデザイン', cat: 'niche', keywords: ['UI', 'UIデザイン'], always: false, reason: 'カテゴリ' },
+        { tag: '#グラフィックデザイン', cat: 'niche', keywords: ['グラフィック'], always: false, reason: 'カテゴリ' },
+        { tag: '#写真', cat: 'niche', keywords: ['写真', 'カメラ', 'photo'], always: false, reason: 'メディア' },
+        { tag: '#映像制作', cat: 'niche', keywords: ['映像', '動画制作'], always: false, reason: 'メディア' }
+      ],
+      health: [
+        // お題
+        { tag: '#note', cat: 'omikuji', keywords: [], always: true, reason: 'note内コミュニティ・基本タグ' },
+        { tag: '#毎日note', cat: 'omikuji', keywords: ['毎日'], always: false, reason: '継続感' },
+        { tag: '#今日の振り返り', cat: 'omikuji', keywords: ['振り返り'], always: false, reason: 'お題' },
+        // 大箱
+        { tag: '#健康', cat: 'large', keywords: ['健康', 'ヘルス'], always: true, reason: 'ジャンル軸' },
+        { tag: '#ライフスタイル', cat: 'large', keywords: ['ライフスタイル', '暮らし'], always: false, reason: '関連大箱' },
+        { tag: '#暮らし', cat: 'large', keywords: ['暮らし', '生活'], always: false, reason: '広め大箱' },
+        // 中箱
+        { tag: '#ヨガ', cat: 'medium', keywords: ['ヨガ', 'yoga'], always: false, reason: '関連中箱' },
+        { tag: '#ランニング', cat: 'medium', keywords: ['ランニング', 'ジョギング', '走'], always: false, reason: '関連中箱' },
+        { tag: '#食生活', cat: 'medium', keywords: ['食事', '食生活', '料理'], always: false, reason: '関連中箱' },
+        { tag: '#ウェルネス', cat: 'medium', keywords: ['ウェルネス'], always: false, reason: 'トレンド層' },
+        { tag: '#運動', cat: 'medium', keywords: ['運動', 'スポーツ'], always: false, reason: '広め中箱' },
+        { tag: '#睡眠', cat: 'medium', keywords: ['睡眠', '眠り'], always: false, reason: '関連中箱' },
+        { tag: '#ダイエット', cat: 'medium', keywords: ['ダイエット', '減量'], always: false, reason: '具体ニーズ' },
+        { tag: '#メンタル', cat: 'medium', keywords: ['メンタル', 'メンタルヘルス'], always: false, reason: '関連中箱' },
+        // ニッチ
+        { tag: '#朝活', cat: 'niche', keywords: ['朝活', '早起き'], always: false, reason: '具体ニーズ' },
+        { tag: '#瞑想', cat: 'niche', keywords: ['瞑想', 'マインドフルネス'], always: false, reason: '具体ニーズ' },
+        { tag: '#ヘルスケア', cat: 'niche', keywords: ['ヘルスケア'], always: false, reason: '関連ニッチ' },
+        { tag: '#自分時間', cat: 'niche', keywords: ['自分時間', 'セルフケア'], always: false, reason: '癒し系' },
+        { tag: '#マインドフルネス', cat: 'niche', keywords: ['マインドフルネス'], always: false, reason: '具体' },
+        { tag: '#筋トレ', cat: 'niche', keywords: ['筋トレ', 'トレーニング'], always: false, reason: '具体' },
+        { tag: '#ジム', cat: 'niche', keywords: ['ジム', 'gym'], always: false, reason: '具体' },
+        { tag: '#健康習慣', cat: 'niche', keywords: ['健康習慣', '習慣'], always: false, reason: '実践系' },
+        { tag: '#食事管理', cat: 'niche', keywords: ['食事管理'], always: false, reason: '実践系' },
+        { tag: '#自炊', cat: 'niche', keywords: ['自炊', '家ごはん'], always: false, reason: '具体' },
+        { tag: '#丁寧な暮らし', cat: 'niche', keywords: ['丁寧な暮らし'], always: false, reason: 'スタイル' },
+        { tag: '#ミニマリスト', cat: 'niche', keywords: ['ミニマリスト', 'シンプル'], always: false, reason: 'スタイル' },
+        { tag: '#ナチュラルライフ', cat: 'niche', keywords: ['ナチュラル'], always: false, reason: 'スタイル' },
+        { tag: '#早寝早起き', cat: 'niche', keywords: ['早寝', '早起き'], always: false, reason: '習慣' },
+        { tag: '#温活', cat: 'niche', keywords: ['温活'], always: false, reason: 'トレンド' },
+        { tag: '#腸活', cat: 'niche', keywords: ['腸活'], always: false, reason: 'トレンド' },
+        { tag: '#メンタルケア', cat: 'niche', keywords: ['メンタルケア'], always: false, reason: 'ケア系' },
+        { tag: '#セルフケア', cat: 'niche', keywords: ['セルフケア'], always: false, reason: 'ケア系' },
+        { tag: '#リラックス', cat: 'niche', keywords: ['リラックス', 'リフレッシュ'], always: false, reason: 'ケア系' }
+      ]
+    };
+
+    const catLabels = {
+      omikuji: 'お題',
+      large: '大箱',
+      medium: '中箱',
+      niche: 'ニッチ'
+    };
+
+    const STORAGE_KEY = 'tagkuru_db_v1';
+
+    // localStorage が使えるか検出
+    const storageAvailable = (function() {
+      try {
+        localStorage.setItem('__tagkuru_test__', '1');
+        localStorage.removeItem('__tagkuru_test__');
+        return true;
+      } catch (e) {
+        return false;
+      }
+    })();
+
+    let currentTagDB = loadTagDB();
+    let currentEditGenre = 'side_business';
+
+    function loadTagDB() {
+      if (!storageAvailable) {
+        return JSON.parse(JSON.stringify(defaultTagDB));
+      }
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          // 期待する全ジャンルが揃っていればそれを使用
+          if (genreOrder.every(g => Array.isArray(parsed[g]))) {
+            return parsed;
+          }
+        }
+      } catch (e) { console.warn('辞書読み込み失敗:', e); }
+      return JSON.parse(JSON.stringify(defaultTagDB));
+    }
+
+    function saveTagDB() {
+      if (!storageAvailable) {
+        showSaveIndicator();
+        return;
+      }
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(currentTagDB));
+        showSaveIndicator();
+      } catch (e) {
+        console.warn('辞書保存失敗:', e);
+        showSaveIndicator();
+      }
+    }
+
+    function showSaveIndicator() {
+      const ind = document.getElementById('saveIndicator');
+      ind.classList.add('show');
+      clearTimeout(showSaveIndicator._t);
+      showSaveIndicator._t = setTimeout(() => ind.classList.remove('show'), 1500);
+    }
+
+    // ──────────────────────────────────────────
+    // ジャンル選択 dropdown 初期化
+    // ──────────────────────────────────────────
+    function initGenreSelector() {
+      const sel = document.getElementById('genre');
+      sel.innerHTML = '';
+      for (const key of genreOrder) {
+        const m = genreMeta[key];
+        const opt = document.createElement('option');
+        opt.value = key;
+        opt.textContent = `${m.emoji} ${m.name}`;
+        sel.appendChild(opt);
+      }
+    }
+
+    // ──────────────────────────────────────────
+    // タグ提案メイン
+    // ──────────────────────────────────────────
+    function suggestTags() {
+      const genre = document.getElementById('genre').value;
+      const article = document.getElementById('article').value;
+
+      if (!article.trim()) {
+        alert('記事本文を入力してください');
+        return;
+      }
+
+      const articleLower = article.toLowerCase();
+      const candidates = currentTagDB[genre] || [];
+      const scored = [];
+
+      for (const c of candidates) {
+        let score = 0;
+        if (c.always) score += 5;
+
+        for (const kw of (c.keywords || [])) {
+          if (!kw) continue;
+          const re = new RegExp(escapeRegExp(kw.toLowerCase()), 'g');
+          const matches = (articleLower.match(re) || []).length;
+          score += matches * 3;
+        }
+
+        if (score > 0) scored.push({ ...c, score, label: catLabels[c.cat] || c.cat });
+      }
+
+      scored.sort((a, b) => b.score - a.score);
+
+      const groups = { omikuji: [], large: [], medium: [], niche: [] };
+      for (const s of scored) {
+        if (groups[s.cat]) groups[s.cat].push(s);
+      }
+
+      const picked = [
+        ...groups.omikuji.slice(0, 2),
+        ...groups.large.slice(0, 3),
+        ...groups.medium.slice(0, 3),
+        ...groups.niche.slice(0, 3)
+      ];
+
+      const seen = new Set();
+      const final = [];
+      picked.sort((a, b) => b.score - a.score);
+      for (const p of picked) {
+        if (!seen.has(p.tag)) {
+          seen.add(p.tag);
+          final.push(p);
+          if (final.length >= 10) break;
+        }
+      }
+
+      renderTags(final);
+    }
+
+    function escapeRegExp(s) {
+      return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function renderTags(final) {
+      const out = document.getElementById('output');
+      const tagsDiv = document.getElementById('tags');
+      const copyArea = document.getElementById('copyArea');
+
+      tagsDiv.innerHTML = '';
+
+      if (final.length === 0) {
+        tagsDiv.innerHTML = '<p style="color: #999;">マッチするタグが見つかりませんでした。本文をもう少し詳しく入力するか、別のジャンルを試してください。</p>';
+        copyArea.textContent = '';
+      } else {
+        for (const f of final) {
+          const div = document.createElement('div');
+          div.className = 'tag-item';
+          div.innerHTML = `
+            <div>
+              <span class="tag-name">${escapeHtml(f.tag)}</span>
+              <span class="tag-category cat-${f.cat}">${escapeHtml(f.label)}</span>
+            </div>
+            <div class="tag-reason">${escapeHtml(f.reason || '')}</div>
+          `;
+          tagsDiv.appendChild(div);
+        }
+        copyArea.textContent = final.map(f => f.tag).join(' ');
+      }
+
+      out.style.display = 'block';
+      out.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+    }
+
+    function copyTags() {
+      const text = document.getElementById('copyArea').textContent;
+      if (!text) return;
+      navigator.clipboard.writeText(text).then(() => {
+        const msg = document.getElementById('copiedMsg');
+        msg.classList.add('show');
+        setTimeout(() => msg.classList.remove('show'), 1500);
+      });
+    }
+
+    // ──────────────────────────────────────────
+    // 辞書エディタ
+    // ──────────────────────────────────────────
+    function toggleEditor() {
+      const main = document.getElementById('mainView');
+      const editor = document.getElementById('editorView');
+      const btn = document.getElementById('toggleEditorBtn');
+      if (editor.style.display === 'none') {
+        main.style.display = 'none';
+        editor.style.display = 'block';
+        btn.style.display = 'none';
+        document.getElementById('storageWarning').style.display = storageAvailable ? 'none' : 'block';
+        renderGenreTabs();
+        renderEditor();
+      } else {
+        main.style.display = 'block';
+        editor.style.display = 'none';
+        btn.style.display = 'inline-block';
+      }
+    }
+
+    function renderGenreTabs() {
+      const tabs = document.getElementById('genreTabs');
+      tabs.innerHTML = '';
+      for (const key of genreOrder) {
+        const m = genreMeta[key];
+        const btn = document.createElement('button');
+        btn.className = 'tab-btn' + (key === currentEditGenre ? ' active' : '');
+        btn.dataset.genre = key;
+        btn.textContent = `${m.emoji} ${m.name}`;
+        btn.onclick = () => switchGenre(key);
+        tabs.appendChild(btn);
+      }
+    }
+
+    function switchGenre(g) {
+      currentEditGenre = g;
+      renderGenreTabs();
+      renderEditor();
+    }
+
+    function renderEditor() {
+      const list = document.getElementById('editorList');
+      const tags = currentTagDB[currentEditGenre] || [];
+      list.innerHTML = '';
+
+      tags.forEach((tag, idx) => {
+        const card = document.createElement('div');
+        card.className = 'edit-tag-card';
+        card.innerHTML = `
+          <div class="edit-tag-row">
+            <div>
+              <label>タグ名（#含む）</label>
+              <input type="text" value="${escapeHtml(tag.tag)}" data-field="tag" data-idx="${idx}">
+            </div>
+            <div>
+              <label>カテゴリ</label>
+              <select data-field="cat" data-idx="${idx}">
+                <option value="omikuji" ${tag.cat==='omikuji'?'selected':''}>お題</option>
+                <option value="large" ${tag.cat==='large'?'selected':''}>大箱</option>
+                <option value="medium" ${tag.cat==='medium'?'selected':''}>中箱</option>
+                <option value="niche" ${tag.cat==='niche'?'selected':''}>ニッチ</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label>キーワード（カンマ区切り）</label>
+            <textarea data-field="keywords" data-idx="${idx}">${escapeHtml((tag.keywords||[]).join(', '))}</textarea>
+          </div>
+          <div style="margin-top: 10px;">
+            <label>狙い（説明）</label>
+            <input type="text" value="${escapeHtml(tag.reason||'')}" data-field="reason" data-idx="${idx}" class="full-width">
+          </div>
+          <div class="edit-tag-actions">
+            <label class="always-label">
+              <input type="checkbox" data-field="always" data-idx="${idx}" ${tag.always?'checked':''}>
+              常に提案候補（always）
+            </label>
+            <button class="danger-btn" onclick="deleteTag(${idx})">🗑️ 削除</button>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+
+      list.querySelectorAll('input, select, textarea').forEach(el => {
+        const evt = el.type === 'checkbox' ? 'change' : 'input';
+        el.addEventListener(evt, debounce(() => {
+          const idx = parseInt(el.dataset.idx, 10);
+          const field = el.dataset.field;
+          const tag = currentTagDB[currentEditGenre][idx];
+          if (!tag) return;
+          if (field === 'keywords') {
+            tag.keywords = el.value.split(',').map(s => s.trim()).filter(Boolean);
+          } else if (field === 'always') {
+            tag.always = el.checked;
+          } else {
+            tag[field] = el.value;
+          }
+          saveTagDB();
+        }, 400));
+      });
+    }
+
+    function debounce(fn, ms) {
+      let t;
+      return function(...args) {
+        clearTimeout(t);
+        t = setTimeout(() => fn.apply(this, args), ms);
+      };
+    }
+
+    function deleteTag(idx) {
+      const tag = currentTagDB[currentEditGenre][idx];
+      if (!confirm('「' + tag.tag + '」を削除しますか？')) return;
+      currentTagDB[currentEditGenre].splice(idx, 1);
+      saveTagDB();
+      renderEditor();
+    }
+
+    function addNewTag() {
+      // 一覧の先頭に追加（追加ボタンの直下に新タグが現れる）
+      currentTagDB[currentEditGenre].unshift({
+        tag: '#新タグ',
+        cat: 'niche',
+        keywords: [],
+        always: false,
+        reason: ''
+      });
+      saveTagDB();
+      renderEditor();
+      // 先頭のタグ名入力欄にフォーカス＆選択
+      const first = document.querySelector('#editorList .edit-tag-card input[data-field="tag"]');
+      if (first) { first.focus(); first.select(); }
+    }
+
+    function exportDB() {
+      const data = JSON.stringify(currentTagDB, null, 2);
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'tagkuru_db_' + new Date().toISOString().slice(0,10) + '.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importDB() {
+      document.getElementById('importFile').click();
+    }
+
+    function handleImport(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        try {
+          const data = JSON.parse(ev.target.result);
+          if (!genreOrder.every(g => Array.isArray(data[g]))) {
+            alert('辞書ファイルの形式が不正です（全ジャンルキーが必要）');
+            return;
+          }
+          if (!confirm('現在の辞書を上書きします。よろしいですか？')) return;
+          currentTagDB = data;
+          saveTagDB();
+          renderEditor();
+        } catch (err) {
+          alert('ファイル読み込みに失敗しました: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = '';
+    }
+
+    function resetDB() {
+      if (!confirm('辞書をデフォルトに戻します。現在の編集は失われます。よろしいですか？')) return;
+      currentTagDB = JSON.parse(JSON.stringify(defaultTagDB));
+      saveTagDB();
+      renderEditor();
+    }
+
+    // 初期化
+    initGenreSelector();
+  </script>
+</body>
+</html>
